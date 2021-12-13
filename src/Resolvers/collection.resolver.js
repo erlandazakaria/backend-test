@@ -26,6 +26,11 @@ export const newCollection = async (root, args, { auth }, info) => {
     const { name, id_restaurant } = args;
     let message = "";
 
+    const collectionData = await CollectionModel.findOne({user: auth._id, name}).exec();
+    if(collectionData) {
+      return { message: "You have collection with same name" };
+    }
+
     const fields = { name, restaurants: [], user: auth._id };
     if(id_restaurant) {
       fields.restaurants.push(id_restaurant);
@@ -50,7 +55,7 @@ export const addToCollection = async (root, args, { auth }, info) => {
     const { id_collection, id_restaurant } = args;
     let message = "";
 
-    const collectionData = await CollectionModel.findOne({id_collection}).exec();
+    const collectionData = await CollectionModel.findById(id_collection).exec();
     if(!collectionData) {
       return { message: "Collection does not exist" };
     }
@@ -79,7 +84,7 @@ export const deleteFromCollection = async (root, args, { auth }, info) => {
     const { id_collection, id_restaurant } = args;
     let message = "";
 
-    const collectionData = await CollectionModel.findOne({id_collection}).exec();
+    const collectionData = await CollectionModel.findById(id_collection).exec();
     if(!collectionData) {
       return { message: "Collection does not exist" };
     }
@@ -103,7 +108,7 @@ export const renameCollection = async (root, args, { auth }, info) => {
     const { id_collection, name } = args;
     let message = "";
 
-    const collectionData = await CollectionModel.find({id_collection}).exec();
+    const collectionData = await CollectionModel.findById(id_collection).exec();
     if(!collectionData) {
       return { message: "Collection does not exist" };
     }
