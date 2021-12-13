@@ -1,7 +1,7 @@
 require('dotenv').config();
 import mongoose from "mongoose";
 
-const serverPort = 80;
+const serverPort = process.env.PORT || 80;
 const dbServer =  process.env.MODE === "production" ? process.env.PROD_DATABASE : process.env.DEV_DATABASE;
 
 const dbConnect = async () => {
