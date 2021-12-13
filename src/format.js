@@ -1,5 +1,9 @@
 import _ from "lodash";
 import fs from "fs";
+import { promisify } from "util";
+import { data } from "../data/data";
+
+const promisifiedReadFile = promisify(fs.readFile);
 
 const dateEnum = {
   "Sun": "Sunday",
@@ -20,8 +24,9 @@ const generateHours = (string) => {
 
   const format24hour = (hour) => {
     const split = hour.split(":");
-    let h = split[0];
+    let h = split[0].replace("am", "").replace("pm", "");
     let m = "00";
+
     if(split.length > 1) {
       m = split[1].replace("am", "").replace("pm", "");
     }
@@ -61,6 +66,19 @@ const generateDayDuration = (string) => {
   return opening
 }
 
+const generateDay = (string) => {
+  let addition = [];
+  dateEnumArr.forEach(date => {
+    let findDate = string.indexOf(date);
+    
+    if(findDate >= 0) {
+      addition.push(date)
+    }
+  })
+  
+  return addition;
+}
+
 const formatOpening = (openingArr) => {
   let opening = {};
 
@@ -68,7 +86,7 @@ const formatOpening = (openingArr) => {
     let string = str
     let untilDuration = {};
     let addition = {};
-    // Check Until
+    // Check Day Duration
     const count = (string.match(/-/g) || []).length;
     if(count > 1) {
       const dashIndex = string.indexOf("-");
@@ -79,19 +97,19 @@ const formatOpening = (openingArr) => {
       untilDuration = generateDayDuration(countText);
       string = string.replace(countText, "");
     }
-    // Check Comma
-    const comma = (string.match(/,/g) || []).length;
-    if(comma > 0) {
-      const commaIndex = string.indexOf(",");
-      let commaText = "";
-      for(let i=commaIndex+1; i <= 3; i++) {
-        commaText = commaText + string[i];
-      }
-      addition[dateEnum[commaText]] = {start: null, end: null};
-      string = string.replace("," + commaText, "");
-    }
+    
+    // Check Other Day
+    string = string.replace(/,/g, "");
+    
+    let findAddDay = generateDay(string);
+    findAddDay.forEach(foundAddDay => {
+      addition[dateEnum[foundAddDay]] = {start: null, end: null};
+      string = string.replace(foundAddDay, "")
+    })
+    
     // Get Hours
     const hours = generateHours(string);
+    
     Object.keys(untilDuration).forEach(key => {
       untilDuration[key].start = hours.start;
       untilDuration[key].end = hours.end;
@@ -108,30 +126,23 @@ const formatOpening = (openingArr) => {
   return opening
 }
 
-let data
-
-fs.readFile("./data/data.json", (err, res) => {
-  if (err) throw err;
-  data = JSON.parse(JSON.stringify(res));
-});
-
-const raw = _.take(data, 100);
-const formatted = raw.map(restaurant => {
+// const raw = _.take(data, 100);
+const formatted = data.map(restaurant => {
   const opening = formatOpening(restaurant.opening
-    .replace(/ /g, "")
-    .replace(/Tues/g, "Tue")
-    .replace(/Weds/g, "Wed")
-    .replace(/Thurs/g, "Thu")
-    .split("/")
-  );
+      .replace(/ /g, "")
+      .replace(/Tues/g, "Tue")
+      .replace(/Weds/g, "Wed")
+      .replace(/Thurs/g, "Thu")
+      .split("/")
+    );
 
   return {...restaurant, opening}
 });
 
-fs.writeFile("./formatted.json", JSON.stringify(formatted), (err) => {
-  if (err)
+fs.writeFile("./data/formatted.json", JSON.stringify(formatted), (err) => {
+  if (err) {
     console.log(err);
-  else {
+  } else {
     console.log("File written successfully\n");
   }
 });
