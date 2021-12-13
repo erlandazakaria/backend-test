@@ -1,0 +1,36 @@
+{
+  "name": "glints-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": {
+    "email": "erlandazakaria@gmail.com",
+    "name": "Erlanda Zakaria"
+  },
+  "license": "MIT",
+  "private": "false",
+  "dependencies": {
+    "apollo-server": "^3.5.0",
+    "apollo-server-express": "^3.5.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "graphql": "^16.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "mongoose": "^6.1.1",
+    "multer": "^1.4.4",
+    "mustache": "^4.2.0",
+    "nodemailer": "^6.7.2",
+    "nodemon": "^2.0.15",
+    "socket.io": "^4.4.0"
+  },
+  "nodemonConfig": {
+    "ignore": ["*.json"]
+  },
+  "scripts": {
+    "start": "nodemon -r esm ./src/index.js",
+    "format": "nodemon -r esm ./src/format.js"
+  }
+}
