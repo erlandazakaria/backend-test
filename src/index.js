@@ -26,6 +26,7 @@ const io = require('socket.io')(server, {
 exp.use(express.urlencoded({ extended: true }));
 exp.use(express.json({limit: "5Mb"}));
 exp.use(express.static(path.join(__dirname, "./Assets")));
+exp.get("/", (req, res) => res.send("Glint Test Backend"));
 
 dbConnect();
 
